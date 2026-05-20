@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: brgy-san-isidro-information-management-system
+    env: python
+    buildCommand: bash build.sh
+    startCommand: gunicorn barangay_system.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: .onrender.com,localhost,127.0.0.1
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://*.onrender.com
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: brgy-san-isidro-db
+          property: connectionString
+
+databases:
+  - name: brgy-san-isidro-db
+    databaseName: brgy_san_isidro
+    user: brgy_san_isidro_user
