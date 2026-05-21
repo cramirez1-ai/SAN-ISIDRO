@@ -110,7 +110,11 @@ DATABASES = {
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
 if DATABASE_URL and '://' in DATABASE_URL and dj_database_url:
-    DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    DATABASES['default'] = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=int(os.environ.get('DB_CONN_MAX_AGE', '0')),
+        ssl_require=True,
+    )
 elif os.environ.get('POSTGRES_DB'):
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
