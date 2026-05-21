@@ -6,6 +6,9 @@ media/
 staticfiles/
 .env
 .venv/
+.python313/
 venv/
 env/
+server-*.log
+server-*.err.log
 .DS_Store

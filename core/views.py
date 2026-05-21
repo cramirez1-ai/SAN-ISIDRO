@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
+from django.db.utils import OperationalError, ProgrammingError
 from django.forms import modelform_factory
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.html import escape
@@ -263,12 +264,17 @@ def settings(request):
 
 def ensure_default_admin():
     User = get_user_model()
-    user, created = User.objects.get_or_create(username=ADMIN_USERNAME, defaults={"email": "admin@sanisidro.gov.ph"})
-    if created or not user.is_staff or not user.is_superuser:
-        user.is_staff = True
-        user.is_superuser = True
-        user.set_password(ADMIN_PASSWORD)
-        user.save()
+    try:
+        user, created = User.objects.get_or_create(username=ADMIN_USERNAME, defaults={"email": "admin@sanisidro.gov.ph"})
+        if created or not user.is_staff or not user.is_superuser:
+            user.is_staff = True
+            user.is_superuser = True
+            user.set_password(ADMIN_PASSWORD)
+            user.save()
+    except (OperationalError, ProgrammingError):
+        # The default admin is also created by migration 0002. During a fresh
+        # setup, allow the app to load until migrations have been applied.
+        return
 
 
 def user_create_or_list(request, form_class, model, active, title, subtitle):
@@ -288,7 +294,7 @@ def user_create_or_list(request, form_class, model, active, title, subtitle):
 
 def get_section(section):
     if section not in ADMIN_MODELS:
-        raise KeyError(section)
+        raise Http404("Management section not found.")
     return ADMIN_MODELS[section]
 
 

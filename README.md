@@ -5,43 +5,43 @@ Brgy San Isidro Surigao City, Surigao del Norte, Philippines Information Managem
 ## Local setup
 
 ```powershell
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver 8005
+.\run.ps1
 ```
 
 Open `http://127.0.0.1:8005/`.
+
+If PowerShell blocks the script, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run.ps1
+```
+
+The script creates `.venv`, installs dependencies, runs migrations, and starts the development server. It requires Python 3.13 or newer to be installed and available on PATH.
 
 Default admin:
 
 - Username: `admin`
 - Password: `Admin@12345`
 
-## Render deployment
+## Vercel deployment
 
-Use this folder, `barangay_system`, as the Render root directory.
+Use this folder, `barangay_system`, as the Vercel project root directory.
 
-Build command:
+Vercel uses:
 
-```bash
-bash build.sh
-```
-
-Start command:
-
-```bash
-gunicorn barangay_system.wsgi:application
-```
+- `vercel.json` for routing
+- `api/index.py` as the Python serverless entrypoint
+- `requirements.txt` for Python dependencies
 
 Environment variables:
 
 - `DEBUG=False`
 - `SECRET_KEY=<generate a secure value>`
-- `ALLOWED_HOSTS=.onrender.com,your-app-name.onrender.com`
-- `CSRF_TRUSTED_ORIGINS=https://your-app-name.onrender.com`
-- `DATABASE_URL=<Render PostgreSQL internal connection string>`
+- `ALLOWED_HOSTS=.vercel.app,your-app-name.vercel.app`
+- `CSRF_TRUSTED_ORIGINS=https://your-app-name.vercel.app`
+- `DATABASE_URL=<hosted PostgreSQL connection string>`
 
-The included `render.yaml` can also be used as a Render Blueprint.
+Use a hosted PostgreSQL database for production, such as Vercel Postgres, Neon, or Supabase. SQLite is only suitable for local development.
 
 ## Local PostgreSQL option
 
