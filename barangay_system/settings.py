@@ -33,7 +33,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-4nm*x257ku99ryql=ejpy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,.vercel.app').split(',')
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,.vercel.app').split(',')
+    if host.strip()
+]
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.vercel.app').split(',')
@@ -96,8 +100,8 @@ DATABASES = {
     }
 }
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL and dj_database_url:
+DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+if DATABASE_URL and '://' in DATABASE_URL and dj_database_url:
     DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 elif os.environ.get('POSTGRES_DB'):
     DATABASES['default'] = {
